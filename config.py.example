@@ -6,3 +6,4 @@ COUNTDOWN_DELAY = 1
 SHOW_PHOTO_DELAY = 5
 BUTTON_PIN = 21
 OVERLAY_FILENAME = '/home/pi/overlay.png'
+SAVE_PATH = '/home/pi/photos/'

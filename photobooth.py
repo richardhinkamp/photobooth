@@ -3,8 +3,7 @@ from time import sleep, strftime
 from signal import pause
 from PIL import Image
 from gpiozero import Button
-
-from config import VFLIP, BRIGHTNESS, EXPOSURE_MODE, PREVIEW_BRIGHTNESS, BUTTON_PIN, OVERLAY_FILENAME
+from config import VFLIP, BRIGHTNESS, EXPOSURE_MODE, PREVIEW_BRIGHTNESS, BUTTON_PIN, OVERLAY_FILENAME, COUNTDOWN_DELAY, SHOW_PHOTO_DELAY, SAVE_PATH
 
 camera = PiCamera(resolution=(3280, 1845))
 camera.vflip = VFLIP
@@ -55,14 +54,14 @@ def capture():
 	stamp = strftime("%Y%m%d-%H%M%S")
 	whiteOverlay = camera.add_overlay(imgWhite.tobytes(), layer=9, size=(1920, 1080));
 	camera.brightness = BRIGHTNESS
-	camera.capture('/home/pi/photos/full/' + stamp + '.jpg', use_video_port=False)
+	camera.capture(SAVE_PATH + '/full/' + stamp + '.jpg', use_video_port=False)
 	camera.brightness = PREVIEW_BRIGHTNESS
 	
 	# crop full image back to video viewport
 	fullImg = Image.open('/home/pi/photos/full/' + stamp + '.jpg');
 	imgVideoView = fullImg.crop((680,382,1920+680,1080+382))
 	fullImg = None
-	imgVideoView.save('/home/pi/photos/hd/' + stamp + '.jpg')
+	imgVideoView.save(SAVE_PATH + '/hd/' + stamp + '.jpg')
 	
 	# show taken picture for 5 seconds
 	imgPhoto = imageToPad(imgVideoView);
