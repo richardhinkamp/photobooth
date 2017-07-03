@@ -3,6 +3,7 @@ from time import sleep, strftime
 from signal import pause
 from PIL import Image
 from gpiozero import Button
+import piexif
 from config import VFLIP, BRIGHTNESS, EXPOSURE_MODE, PREVIEW_BRIGHTNESS, BUTTON_PIN, OVERLAY_FILENAME, COUNTDOWN_DELAY, SHOW_PHOTO_DELAY, SAVE_PATH
 
 camera = PiCamera(resolution=(3280, 1845))
@@ -58,10 +59,21 @@ def capture():
 	camera.brightness = PREVIEW_BRIGHTNESS
 	
 	# crop full image back to video viewport
-	fullImg = Image.open(SAVE_PATH + '/full/' + stamp + '.jpg');
+	fullImg = Image.open(SAVE_PATH + '/full/' + stamp + '.jpg')
+	exif_dict = piexif.load(fullImg.info["exif"])
+	fullImg = Image.open(SAVE_PATH + '/full/' + stamp + '.jpg')
 	imgVideoView = fullImg.crop((680,382,1920+680,1080+382))
 	fullImg = None
-	imgVideoView.save(SAVE_PATH + '/hd/' + stamp + '.jpg')
+	w, h = imgVideoView.size
+	exif_dict["0th"][piexif.ImageIFD.XResolution] = (w, 1)
+	exif_dict["0th"][piexif.ImageIFD.YResolution] = (h, 1)
+	exif_dict["0th"][piexif.ImageIFD.ImageWidth] = w
+	exif_dict["0th"][piexif.ImageIFD.ImageLength] = h
+	exif_dict["Exif"][piexif.ExifIFD.PixelXDimension] = w
+	exif_dict["Exif"][piexif.ExifIFD.PixelYDimension] = h
+	del exif_dict["thumbnail"]
+	exif_bytes = piexif.dump(exif_dict)
+	imgVideoView.save(SAVE_PATH + '/hd/' + stamp + '.jpg', 'jpeg', exif=exif_bytes)
 	
 	# show taken picture for 5 seconds
 	imgPhoto = imageToPad(imgVideoView);
