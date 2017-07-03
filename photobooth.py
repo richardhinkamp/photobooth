@@ -58,7 +58,7 @@ def capture():
 	camera.brightness = PREVIEW_BRIGHTNESS
 	
 	# crop full image back to video viewport
-	fullImg = Image.open('/home/pi/photos/full/' + stamp + '.jpg');
+	fullImg = Image.open(SAVE_PATH + '/full/' + stamp + '.jpg');
 	imgVideoView = fullImg.crop((680,382,1920+680,1080+382))
 	fullImg = None
 	imgVideoView.save(SAVE_PATH + '/hd/' + stamp + '.jpg')
